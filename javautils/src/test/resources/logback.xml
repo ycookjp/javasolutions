@@ -1,0 +1,64 @@
+<configuration>
+
+  <!-- standard output appender -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- encoders are assigned the type
+         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- daily file appender -->
+  <timestamp key="datetime" datePattern="yyyyMMdd" timeReference="contextBirth" />
+  <appender name="FILE_DAYLY" class="ch.qos.logback.core.FileAppender">
+    <file>${java.io.tmpdir}/javasolutions/javautils-${datetime}.log</file>
+    <prudent>true</prudent>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{0}]%class{0}.%method\(%L\) - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- time based rolling appender -->
+  <appender name="ROLLING_TIME" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <!--
+    <file>${java.io.tmpdir}/javasolutions/javasolutions.time.log</file>
+   -->
+    <prudent>true</prudent>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${java.io.tmpdir}/javasolutions/javasolutions.time.%d{yyyyMMddHHmm}.log</fileNamePattern>
+      <maxHistory>5</maxHistory>
+      <cleanHistoryOnStart>true</cleanHistoryOnStart>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{0}]%class{0}.%method\(%L\) - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- fixed window rolling appender -->
+  <appender name="ROLLING_FIXED" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${java.io.tmpdir}/javasolutions/javasolutions.fixed.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${java.io.tmpdir}/javasolutions/javasolutions.fixed.%i.log.zip</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>5</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>100KB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{0}]%class{0}.%method\(%L\) - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- logger -->
+  <logger name="test.myproject.java.utils" level="debug">
+    <appender-ref ref="FILE_DAYLY" />
+  </logger>
+
+  <root level="debug">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="ROLLING_FIXED" />
+    <appender-ref ref="ROLLING_TIME" />
+  </root>
+</configuration>

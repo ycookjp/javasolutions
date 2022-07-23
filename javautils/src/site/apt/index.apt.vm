@@ -1,0 +1,20 @@
+     ------------------
+     Javautils Project
+     ------------------
+     ------------------
+
+Javautils Project
+
+  Javautils project provides helper methods for java standard classes. This project is exprerimental.
+
+* Download
+
+  * {{{./${project.artifactId}-${project.version}.jar}${project.artifactId}-${project.version}.jar}}
+
+  * {{{./${project.artifactId}-${project.version}-sources.zip}${project.artifactId}-${project.version}-sources.zip}}
+
+* Development memo
+
+  * {{{./devmemo/logback.html}logback}}
+
+  * {{{./devmemo/swingtest.html}Swing application test}}

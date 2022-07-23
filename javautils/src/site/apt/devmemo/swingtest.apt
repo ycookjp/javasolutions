@@ -1,0 +1,161 @@
+     ---------------------------
+     Swingアプリケーションのテスト
+     ---------------------------
+     ---------------------------
+
+Swingアプリケーションのテスト
+
+* テストプログラムの例
+
+  JUnitのテストメソッドから、Swingアプリケーションのコンポーネントにアクセス
+  するためのコードを示す。
+
++------------------------------------------------------------------------------+
+import java.lang.reflect.Field;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import myproject.java.utils.SwingUtils;
+
+public class SwingAppTest implements Runnable {
+    /** logger. */
+    private static Logger logger = LoggerFactory.getLogger(SwingUtilsTest.class);
+
+    /** window object. */
+    private ApplicationWindow applicationWindow = null;
+    /** frame object. */
+    private JFrame frame = null;
+
+    /** lock object. */
+    Object lock = new Object();
+
+    /**
+     * テストメソッド実行前の前処理を実行します。
+     * <p>
+     * 別スレッドでウィンドウアプリケーションを起動し、その初期化が終わるまで待機します。
+     */
+    @Before
+    public void setUp() {
+        synchronized(this.lock) {
+            try {
+                // 別スレッドでウィンドウアプリケーションを起動する
+                new Thread(this).start();
+                // ウィンドウアプリケーションの初期化が終わるまで待つ
+                this.lock.wait();
+            } catch (InterruptedException e) { }
+        }
+    }
+
+    /**
+     * ウィンドウアプリケーションを起動し、ウィンドウを可視化します。
+     */
+    @Override
+    public void run() {
+        try {
+            this.applicationWindow = new ApplicationWindow();
+
+            // JFrameを取得する
+            Field frameField = applicationWindow.getClass().getDeclaredField("frame");
+            frameField.setAccessible(true);
+            this.frame = (JFrame) frameField.get(this.applicationWindow);
+
+            // ウィンドウを可視化する
+            this.frame.setVisible(true);
+            synchronized(this.lock) {
+                // メインスレッドの実行を再開する
+                this.lock.notifyAll();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * テストメソッド実行後の後処理を実行します。
+     * <p>
+     * 別スレッドで実行されたウィンドウアプリケーションを終了します。
+     */
+    @After
+    public void tearDown() {
+        if (this.frame != null) {
+            this.frame.dispose();
+            this.frame = null;
+            this.applicationWindow = null;
+        }
+    }
+
+    /**
+     */
+    @Test
+    public void testSwingApplication() {
+        // ウィンドウアプリケーションクラスのフィールドで定義されたJButtonを取得
+        Field button1Field = applicationWindow.getClass().getDeclaredField("button1");
+        button1Field.setAccessible(true);
+        JButton button1 = (JButton) button1Field.get(this.applicationWindow);
+        // JButtonのクリックイベントを実行
+        button1.doClick();
+        // ボタンをクリックした時のテストコードを記述する
+        ...
+
+        // SwingUtilsを使用して、name属性の値からJButtonを取得
+        JButton button2 = (JButton) SwingUtils.getComponentByName(this.frame.getContentPane(), "button2");
+        // JButtonのクリックイベントを実行
+        button2.doClick();
+        // ボタンをクリックした時のテストコードを記述する
+        ....
+    }
+}
++------------------------------------------------------------------------------+
+
+* テストプログラムの説明
+
+  [[1]] 概要
+
+    テストプログラムは、別スレッドでSwingアプリケーションを起動しておき、テスト
+    メソッドはSwingアプリケーションのコンポーネントを取得して、イベントを実行
+    したりコンポーネントの設定内容を確認したりする。そのため、テストクラスは
+    Runnableインターフェースを実装する。
+
+  [[2]] @Before public void setUp()
+
+    テストメソッドを実行する前の前処理として、ロックを設定してスレッドを新規に
+    作成しテストプログラムのrunメソッドをする。
+
+  [[3]] @Override public void run()
+
+    * Swingアプリケーションを実行する
+
+    * Swingアプリケーションのクラスフィールドに設定されたJFrameを取得して、
+      テストクラスのフィールドに設定する
+
+    * Swingアプリケーションのウィンドウを可視化した後にロックを解除して、
+      テストプログラムを実行するスレッドを再開する
+
+  [[4]] @Test public void testSwingApplication()
+
+    テストを実行する。Swingのコンポーネントには、以下の方法でアクセスする。
+
+    * Reflecttion(java.lang.reflect.Fieldクラス)を使用して、ウィンドウ
+      アプリケーションクラスのフィールドに設定されたコンポーネントの
+      インスタンスを取得する
+
+    * JavautilsプロジェクトのSwingUtilsクラスを使用して、コンポーネントの
+      name属性の値を指定してコンポーネントのインスタンスを取得する
+
+    []
+
+    Swingコンポーネントのインスタンスを取得したら、イベントを実行するための
+    コンポーネントのメソッドを実行した後に、コンポーネントの属性を調べるなど
+    してテストを実行する。
+
+  [[5]] @After public void tearDown()
+
+    テストメソッド実行後の後処理として、Swingアプリケーションを強制終了する。

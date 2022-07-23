@@ -1,0 +1,521 @@
+     -------------
+     logbackの設定
+     -------------
+     -------------
+
+logbackの設定
+
+  logbackはlog4jの後継プロジェクトである。
+
+  Contents
+
+  * {{Manual}}
+
+  * {{setup}}
+
+  * {{Notes on log output}}
+
+  * {{logback.xml}}
+
+  * {{log4j-over-slf4j}}
+
+* {Manual}
+
+  * {{{https://logback.qos.ch/manual/index_ja.html}logback マニュアル(和訳)}}
+
+* {setup}
+
+  pom.xmlに以下の設定をする。scopeタグは必要に応じて設定すること。
+
++------------------------------------------------------------------------------+
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.2.3</version>
+</dependency>
++------------------------------------------------------------------------------+
+
+* {Notes on log output}
+
+  プログラムから、ログ出力メソッド（Loggerクラスのerror/info/debug/trace等）を呼び
+  出す場合は、ログメッセージを生成するためのコストを意識すること。具体的には、以下の
+  ようなコードを記述する。
+
+** パラメータ化ロギング
+
+    ログのメッセージにパラメータを指定して、ログの出力レベルがログ出力の対象となる
+    場合のみ文字列の連結が実行されるようにする。
+
++------------------------------------------------------------------------------+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+...
+public class Foo {
+  private static Logger logger = LoggerFactory.getLogger(Foo.class);
+  public method bar(String a) {
+    ...
+    logger.debug("parameter a is {}", a);
+
+    String[] params = new String[]{"Foo", "Bar", "FooBar"};
+    logger.debug("param1:{}, param2:{}, param3:{}", params);
+    ...
+  }
+}
++------------------------------------------------------------------------------+
+
+** テスト条件の判定
+
+  ログの出力レベルを判定して、ログ出力の条件に合致した場合のみログメッセージの生成を
+  生成してログ出力メソッドを実行する。
+
++------------------------------------------------------------------------------+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+...
+public class Foo {
+  private static Logger logger = LoggerFactory.getLogger(Foo.class);
+  public method add(int a, int b) {
+    ...
+    if(logger.isDebugEnabled()) { 
+      logger.debug(a + " plus " + b + " is " + a + b);
+    }
+    ...
+  }
+}
++------------------------------------------------------------------------------+
+
+* {logback.xml}
+
+** 配置
+
+    クラスパスが通っているディレクトリに配置する。
+
+    [補　足]
+
+      「logback-test.xml」が存在する場合は、そちらのファイルが優先する。
+
+** ファイルの記述
+
+  [[1]] 概要
+
+    configurationタブの中に以下の３つのタグを記述する。
+
+    * appender
+
+      ログの出力先を設定する。また、encoder/pattern タグでログの出力内容
+      （フォーマット）も設定する。
+
+    * logger
+
+      * ログの出力対象(name属性で指定)、出力レベル(レベル属性で指定)、ログの
+        出力先(appender-ref タグでappenderを指定)を設定する。
+
+      * appender-ref タグは複数の設定が可能である。
+
+    * root
+
+      * ルートロガー（最上位の階層のlogger）の設定をする。出力レベルとログの
+        出力先を設定する。
+
+      * ログを出力するためには、少なくともlogger、root タグのどちらか１つを
+        記述すること。
+
+    []
+
++------------------------------------------------------------------------------+
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="test.myproject.java.utils" level="info">
+    <appender-ref ref="STDOUT" />
+  </logger>
+
+  <root level="debug">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
++------------------------------------------------------------------------------+
+      \[logback.xmlの記述例\]
+
+    上記の例では、以下のログ様にログを出力する。 
+
+    * ログの出力先は標準出力
+
+    * ログの出力内容は以下のとおり
+
+      * 時刻 - HH:mm:ss.SSS の形式で時分秒ミリ秒を出力する
+
+      * スレッド名
+
+      * 出力レベル - 左寄せ５文字の幅でログの出力レベルを出力する
+
+      * ロガーの名前 - 36文字に収まるようにロガーの名前
+        （LoggerFactory.getLogger(ロガーの名前)で指定した名前）を出力する。
+
+      * ログメッセージ
+
+      * 改行
+
+  [[2]] appenderの設定
+
+    [[A]] ConsoleAppender
+
+      ConsoleAppenderを使用すると、ログを標準出力に出力することができる。
+
++------------------------------------------------------------------------------+
+<configuration>
+  <!-- standard output appender -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  ...
+</configuration>
++------------------------------------------------------------------------------+
+      \[標準出力に出力するappenderの記述例\]
+
+      appenderタグ記述内容は以下のとおり。
+
+      * name属性 - appenderの名前を定義する。loggerまたはrootタグの
+        appender-refタグでは、この名前を指定する。
+
+      * class属性 - "ch.qos.logback.core.ConsoleAppender"を設定する。
+
+      * encoderタグ
+
+        * patternタグ - ログの出力内容（書式）を設定する。
+
+      []
+
+      [patternタグの設定内容について]
+
+        patternタグの記述方法は、
+        {{{https://logback.qos.ch/manual/layouts_ja.html}logback マニュアル 第6章 レイアウト}}
+        を参照のこと。以下に代表的な設定項目を示す。
+
+*-------------------+----------------------------------------------------------+
+| %logger\{length\} | ロガーの名前。一番右側の「.」より前の部分はlengthで指定  |
+|                   | した文字列長に収まるように省略される。文字列長に0を指定  |
+|                   | すると一番右側の「.」より右側の部分だけが出力される。    |
+*-------------------+----------------------------------------------------------+
+| %class\{length\}  | ログ出力メソッドを呼び出したクラスの名前。lengthは       |
+|                   | %loggerと同様である。                                    |
+*-------------------+----------------------------------------------------------+
+| %d\{pattern\}     | 日付時刻。java.text.SimpleDateFormatクラスの書式に従って |
+|                   | patternを指定する。                                      |
+*-------------------+----------------------------------------------------------+
+| %file             | ログ出力メソッドを呼び出したクラスのそーすファイル名。   |
+*-------------------+----------------------------------------------------------+
+| %line             | ログ出力メソッドを呼び出したソースコードの行数。         |
+*-------------------+----------------------------------------------------------+
+| %msg              | ログ出力メソッドで指定されたメッセージ。                 |
+*-------------------+----------------------------------------------------------+
+| %method           | ログ出力メソッドを呼び出したメソッド名。                 |
+*-------------------+----------------------------------------------------------+
+| %n                | プラットフォーム依存の行区切り文字。                     |
+*-------------------+----------------------------------------------------------+
+| %level            | ログ出力レベル。                                         |
+*-------------------+----------------------------------------------------------+
+| %thread           | スレッド名。                                             |
+*-------------------+----------------------------------------------------------+
+| %ex\{depth\}      | 例外のスタックトレース。depthが指定された場合は、        |
+|                   | スタックトレースの先頭から指定された業数までを出力する。 |
+*-------------------+----------------------------------------------------------+
+
+    [[B]] FileAppender
+
+      FileAppenderを使用すると、ログをファイルに出力することができる。
+
++------------------------------------------------------------------------------+
+<configuration>
+  <!-- daily file appender -->
+  <timestamp key="datetime" datePattern="yyyyMMdd" timeReference="contextBirth" />
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>/logfile-dir/logfilename-${datetime}.log</file>
+    <prudent>true</prudent>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{0}]%class{0}.%method\(%L\) - %msg%n</pattern>
+    </encoder>
+  </appender>
+  ...
+</configuration>
++------------------------------------------------------------------------------+
+      \[日別にファイルに出力するappenderの記述例\]
+
+      記述内容は以下のとおり。
+
+      * timestampタグ(省略可)
+
+        ログのファイル名に日付時刻を使用しない場合は、このタグは省略可能である。
+
+        * key属性 - 名前を指定する。appender/fileタグのファイル名からこのタグで
+          定義した日付け文字列の書式を参照する場合は、この名前を指定する。
+
+        * datePattern属性 - java.text.SimpleDateFormatクラスの書式を使用して、
+          日付の書式を指定する。
+
+        * timeReference属性 - "contextBirth"を指定すると、コンテキストを生成した
+          時(最初にログを出力したときと推察される)の日付時刻を生成する。この属性を
+          省略したときは、logback.xmlを読み込んだ時点の日付け時刻を生成する。
+
+      * appenderタグ
+
+        * name属性 - ※ ConsoleAppenderと同じ。
+
+        * class属性 - "ch.qos.logback.core.FileAppender"を指定する。
+
+        * fileタグ - ログ出力先（ディレクトリとファイル名）を指定する。
+          「${timestampの名前}」を指定すると、timestampタグで設定した日付時刻の
+          文字列が設定される。
+
+        * prudentタグ(省略可) - trueを設定すると、排他的にログを出力して複数の
+          プロセスが同じログファイルに出力する場合でも安全にログを出力する。
+
+        * encoderタグ - ※ ConsoleAppenderと同じ
+
+      [注　意]
+
+        FileAppenderでファイル名に日付けを指定した場合は、logback.xmlが読み込まれた
+        時点、または初めてログが出力された時点でログのファイル名が決まるため、起動中に
+        ファイルが切り替わることがない。
+
+    [[C]] RollingFileAppender (日付でログを切り替える)
+
+      rollingPolicyにTimeBasedRollingPolicyを指定して、RollingFileAppenderを
+      使用すると、ログ出力の時間によってログを切り替えることができる。
+
++------------------------------------------------------------------------------+
+<configuration>
+  <!-- time based rolling appender -->
+  <appender name="ROLLING_TIME" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <!-- 
+    <file>/logfile-dir/logfilename.log</file>
+   -->
+    <prudent>true</prudent>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>/logfile-dir/logfilename.%d{yyyyMMddHHmm}.log</fileNamePattern>
+      <maxHistory>5</maxHistory>
+      <cleanHistoryOnStart>true</cleanHistoryOnStart>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{0}]%class{0}.%method\(%L\) - %msg%n</pattern>
+    </encoder>
+  </appender>
+  ...
+</configuration>
++------------------------------------------------------------------------------+
+      \[日付けでログを切り替える設定の例\]
+
+      appenderタグの記述内容は以下のとおり。
+
+      * name属性 - ※ ConsoleAppenderと同じ。
+
+      * class属性 - "ch.qos.logback.core.rolling.RollingFileAppender"を
+        指定する。
+
+      * fileタグ(省略可) - ログ出力先（ディレクトリとファイル名）を指定する。
+        出力中のログはこのファイル名になる。fileタグを省略すると、rollingPolicy
+        / fileNamePattern タグで設定したファイル名が現在出力中のファイル名に
+        適用される。
+
+      * prudentタグ(省略可) - ※ FileAppenderと同じ
+
+        [注　意]
+
+          prudentモード(prudentにtrueを設定する場合)は、以下の制限がある。
+
+          * rollingPolicyがFixedWindowRollingPolicyの場合は設定できない。
+
+          * appender / file タグは設定できない。
+
+          * rollingPolicy / fileNamePatternタグに「.zip」、「.gz」の
+            ファイル名は指定できない（履歴ファイルの圧縮は不可）。
+
+      * rollingPolicyタグ
+
+        * class属性 - "ch.qos.logback.core.rolling.TimeBasedRollingPolicy"
+          を設定する。
+
+        * fileNamePatternタグ - ログが切り替わったときのログ出力先
+          （ディレクトリとファイル名）を指定する。ファイル名に「%d{pattern}」を
+          含めること(この部分に日付け時刻の文字列が設定される)。「%d{pattern}」
+          の設定内容は、encoder / pattern タグと同じである。ファイル名の終わり
+          が「.zip」、または「.gz」の場合は、ログの履歴ファイルは圧縮される。
+
+        * maxHistory(省略可) - 履歴の最大数。ログの履歴ファイルの個数がこの値を
+          超えると、ログの切り替えのタイミングで削除される。省略するとログの履歴
+          ファイルは残ったままとなる。
+
+        * cleanHistoryOnStartタグ(省略可) - trueを設定するとアペンダーの開始時
+          (logback.xmlを読み込んだタイミングと推察される)に履歴を削除する。タグを
+          省略またはfalseを設定した場合は、ログを切り替えるタイミングで古い履歴を
+          削除する。
+
+      * encoderタグ - ※ ConsoleAppenderと同じ
+
+    [[D]] RollingFileAppender (ファイルの大きさでログを切り替える)
+
+      rollingPolicyにFixedWindowRollingPolicyを指定して、RollingFileAppenderを
+      使用すると、指定されたファイルのサイズを越えた時点でログを切り替えることが
+      できる。
+
++------------------------------------------------------------------------------+
+<configuration>
+  <!-- fixed window rolling appender -->
+  <appender name="ROLLING_FIXED" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/logfile-dir/logfilename.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>/logfile-dir/logfilename.%i.log.zip</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>5</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>1MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{0}]%class{0}.%method\(%L\) - %msg%n</pattern>
+    </encoder>
+  </appender>
+  ...
+</configuration>
++------------------------------------------------------------------------------+
+      \[ファイルの大きさでログを切り替える設定の例\]
+
+      appenderタグ記述内容は以下のとおり。
+
+      * name属性 - ※ ConsoleAppenderと同じ。
+
+      * class属性 - "ch.qos.logback.core.rolling.RollingFileAppender"を
+        指定する。
+
+      * fileタグ - ログ出力先（ディレクトリとファイル名）を指定する。出力中の
+        ログは、このファイル名になる。
+
+      * rollingPolicyタグ
+
+        * class属性 - "ch.qos.logback.core.rolling.FixedWindowRollingPolicy"
+          を設定する。
+
+        * fileNamePatternタグ - ログが切り替わったときのログ出力先
+          （ディレクトリとファイル名）を指定する。ファイル名に「%i」を含める
+          こと(%iの部分に履歴の添字が設定される)。ファイル名の終わりが「.zip」、
+          または「.gz」の場合は、ログの履歴ファイルは圧縮される。
+
+        * minIndex - 添字の最小値。
+
+        * maxIndex - 添字の最大値。この値を超えるログはログの切り替えの
+          タイミングで削除される。
+
+      * triggeringPolicyタグ
+
+        * class属性 - "ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy"
+          を指定する。
+
+        * maxFileSizeタグ - ファイルの大きさの上限を指定する。単位に「KB」、「MB」
+          を指定することができる。
+
+      * encoderタグ - ※ ConsoleAppenderと同じ
+
+  [[3]] loggerの設定
+
++------------------------------------------------------------------------------+
+<configuration>
+  <appender name="《アペンダー名》" class="...">
+    ...
+  </appender>
+
+  <logger name="test.myproject.java.utils" level="debug">
+    <appender-ref ref="《アペンダー名》" />
+    ...
+  </logger>
+</configuration>
++------------------------------------------------------------------------------+
+    \[loggerの設定例\]
+
+    loggerタグの設定内容は以下のとおり。
+
+    * name属性 - loggerの名前を指定する。指定された名前とそれより下の階層のロガー
+      が出力したログが出力対象となる。
+
+    * level属性 - ログの出力レベルを指定する。
+
+    * appender-refタグ
+
+      appender-refタグは複数指定することが可能になる。例えば、標準出力のアペンダー、
+      ファイル出力のアペンダーの両方を指定して、ログを標準出力とファイルの両方に
+      出力することが可能である。
+
+      * ref属性 - appenderタグのname属性に設定された名前を指定する。ログの出力は
+        そのappenderタグの設定に従って出力される、
+
+  [[4]] rootの設定
+
++------------------------------------------------------------------------------+
+<configuration>
+  <appender name="《アペンダー名》" class="...">
+    ...
+  </appender>
+
+  <root level="debug">
+    <appender-ref ref="《アペンダー名》" />
+    ...
+  </root>
+</configuration>
++------------------------------------------------------------------------------+
+    \[rootの設定例\]
+
+    rootタグの設定内容は以下のとおり。
+
+    * level属性 - ※ loggerの設定と同様
+
+    * appender-refタグ - ※ loggerの設定と同様
+
+* {log4j-over-slf4j}
+
+  [[1]] 概要
+
+    log4j-over-slf4j は、log4j のインターフェースが呼び出されたときに slf4j の
+    インターフェースに変換する機能を提供する。
+
+    logbackを使用するためには、Javaのソースコードで slf4jのインターフェース
+    (org.slf4j.Logger、及び org.slf4j.LoggerFactory)を使用する必要がある。
+    log4j-over-slf4j により、既存の Java ソースコードが log4j の
+    インターフェースを使用している場合に、ソースコードを変えずに
+    （インターフェースをlog4jのからslf4jに変更せずに）、slf4j の実装クラス
+    （logbackなど）を利用することができる。
+
+  [[2]] インストール
+
+    {{{http://repo2.maven.org/maven2/org/slf4j/log4j-over-slf4j/}Mavenリポジトリ}}
+    から log4j-over-slf4j-x.x.x.jar をダウンロードして、classパスの通った
+    ディレクトリに配置する。このとき、log4j の jar ファイルをclassパスの通った
+    ディレクトリから削除すること。
+
+    [参　考]
+
+      log4j2で使用するjarファイルは、以下のとおり。
+
+      * log4j-api-x.x.x.jar
+
+      * log4j-core-x.x.x.jar
+
+  [[3]] 設定
+
+    * logbackの設定ファイルを設定する。log4jの設定ファイルは参照されなくなるので
+     削除すること。
+
+    * SLF4J Bridge (log4j-slf4j-impl-x.x.x.jar)はclassパスが通ったディレクトリ
+      から削除すること。SLF4J Bridge は、slf4j のインターフェース呼び出しを
+      log4j のインターフェースに変換するものなので、log4j-over-slf4j と同居する
+      ことはできない。
+
+  [[4]] 参考文献
+
+    * {{{http://www.slf4j.org/legacy.html#log4j-over-slf4j}log4j-over-slf4j - Bridging legacy APIs}}
+
+    * {{{https://logging.apache.org/log4j/2.x/maven-artifacts.html#Log4j_to_SLF4J_Adapter}Log4j to SLF4J Adapter - Log4j}}
