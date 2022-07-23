@@ -1,0 +1,5 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+javautils,myproject.java.utils,ClassUtils,200,0,34,0,48,0,20,0,3,0
+javautils,myproject.java.utils,SwingUtils,77,0,18,0,18,0,10,0,1,0
+javautils,myproject.java.utils,PropertiesUtils,127,0,16,0,34,0,10,0,2,0
+javautils,myproject.java.utils,ExceptionUtils,57,0,4,0,10,0,3,0,1,0

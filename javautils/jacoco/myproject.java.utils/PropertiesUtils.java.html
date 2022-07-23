@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertiesUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">javautils</a> &gt; <a href="index.source.html" class="el_package">myproject.java.utils</a> &gt; <span class="el_source">PropertiesUtils.java</span></div><h1>PropertiesUtils.java</h1><pre class="source lang-java linenums">package myproject.java.utils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Properties;
+import java.util.Set;
+
+/**
+ * {@link java.util.Properties}の操作を提供します。
+ * 
+ * Copyright ycookjp
+ * https://github.com/ycookjp/
+ */
+public class PropertiesUtils {
+    /**
+     * 外部からのインスタンス化を抑止するためのコンストラクタ。
+     */
+    private PropertiesUtils() { }
+
+    /**
+     * プロパティファイルのクラスパスを指定して、{@link java.util.Properties}をロードします。
+     * &lt;p&gt;
+     * クラスパスの通ったディレクトリに配置されているプロパティファイルのクラスパスを指定して
+     * プロパティファイルの内容を読み込んだ{@link java.util.Properties}のインスタンスを返します。
+     * クラスパスを指定したディレクトリの下の「test/properties/test.properteis」を読み込む場合は、
+     * クラスパスの名前に「test/properties/test.properties」を指定します。
+     * &lt;/p&gt;
+     * @param name クラスパスの名前
+     * @return {@link java.util.Properties}を返します。nameにnullを指定した場合は、nullを返します。
+     * @throws IOException {@link java.util.Properties}のロードに失敗した場合
+     */
+    public static Properties loadResource(String name) throws IOException {
+<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (name == null) {</span>
+<span class="nc" id="L36">            return null;</span>
+        }
+
+<span class="nc" id="L39">        Properties properties = new Properties();</span>
+<span class="nc" id="L40">        InputStream is = null;</span>
+<span class="nc" id="L41">        Reader reader = null;</span>
+        try {
+<span class="nc" id="L43">            is = ClassLoader.getSystemResourceAsStream(name);</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">            if (is == null) {</span>
+<span class="nc" id="L45">                throw new IOException(&quot;Resource &quot; + name + &quot; not found.&quot;);</span>
+            }
+<span class="nc" id="L47">            reader = new InputStreamReader(is, &quot;ISO8859-1&quot;);</span>
+<span class="nc" id="L48">            properties.load(reader);</span>
+<span class="nc" id="L49">            return properties;</span>
+        } finally {
+<span class="nc bnc" id="L51" title="All 2 branches missed.">            if (reader != null) {</span>
+                try {
+<span class="nc" id="L53">                    reader.close();</span>
+<span class="nc" id="L54">                } catch (IOException ioe) { }</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">            } else if (is != null) {</span>
+                try {
+<span class="nc" id="L57">                    is.close();</span>
+<span class="nc" id="L58">                } catch (IOException ie) { }</span>
+            }
+        }
+    }
+
+    /**
+     * プロパティの値の&quot;{&amp;lt;keyword&amp;gt;}の部分を、システムプロパティ及びパラメータで指定された
+     * プロパティの&amp;lt;keyword&amp;gt;の値で置換します。
+     * @param properties プロパティを指定します。nullを指定すると何もせずに復帰します。
+     */
+    public static void replaceKeyword(Properties properties) {
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (properties == null) {</span>
+<span class="nc" id="L70">            return;</span>
+        }
+<span class="nc" id="L72">        Properties keywords = new Properties();</span>
+<span class="nc" id="L73">        keywords.putAll(System.getProperties());</span>
+<span class="nc" id="L74">        keywords.putAll(properties);</span>
+<span class="nc" id="L75">        Set&lt;Object&gt; keyset = properties.keySet();</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        for (Object key : keyset) {</span>
+<span class="nc" id="L77">            String value = properties.getProperty(key.toString());</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">            if (value != null) {</span>
+<span class="nc" id="L79">                Set&lt;Object&gt; replacementKeySet = keywords.keySet();</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">                for (Object replacementKey : replacementKeySet) {</span>
+<span class="nc" id="L81">                    value = value.replace(&quot;${&quot; + replacementKey.toString() + &quot;}&quot;,</span>
+<span class="nc" id="L82">                            keywords.getProperty(replacementKey.toString()));</span>
+<span class="nc" id="L83">                }</span>
+<span class="nc" id="L84">                properties.put(key, value);</span>
+            }
+<span class="nc" id="L86">        }</span>
+<span class="nc" id="L87">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

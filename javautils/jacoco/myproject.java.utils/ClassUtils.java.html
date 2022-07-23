@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClassUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">javautils</a> &gt; <a href="index.source.html" class="el_package">myproject.java.utils</a> &gt; <span class="el_source">ClassUtils.java</span></div><h1>ClassUtils.java</h1><pre class="source lang-java linenums">package myproject.java.utils;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.CodeSource;
+import java.util.Arrays;
+
+/**
+ * {@link java.lang.Class}の操作を提供します。
+ * 
+ * Copyright ycookjp
+ * https://github.com/ycookjp/
+ */
+public class ClassUtils {
+    /**
+     *  外部からのインスタンス化を抑止するためのコンストラクタ。
+     */
+    private ClassUtils() { }
+
+    /**
+     * クラスを指定して、そのクラスが配置されているクラスパスのディレクトリの親ディレクトリ、
+     * またはjarファイルのパスの親ディレクトリを取得します。
+     * @param cls クラスを指定します。
+     * @return 取得したディレクトリの{@link java.io.File}オブジェクトを返します。
+     *      ディレクトリを取得できなかった場合（主にセキュリティの製薬による）はnullを返します。
+     * @throws URISyntaxException URIの構文が間違っている場合
+     */
+    public static File getClassDirParent(Class&lt;? extends Object&gt; cls) throws URISyntaxException {
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        if (cls == null) {</span>
+<span class="nc" id="L34">            return null;</span>
+        }
+
+        // 指定されたクラスが配置されたクラスパスのディレクトリまたはJarファイルのパスを取得
+<span class="nc" id="L38">        CodeSource cs = cls.getProtectionDomain().getCodeSource();</span>
+
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (cs != null) {</span>
+            // CodeSourceが取得できた場合
+<span class="nc" id="L42">            URL location = cs.getLocation();</span>
+<span class="nc" id="L43">            URI clsUri = location.toURI();</span>
+
+<span class="nc" id="L45">            File clsDirPath = new File(clsUri.getPath());</span>
+
+            // 取得したファイルの親ディレクトリを返す。
+<span class="nc" id="L48">            File clsDirParent = clsDirPath.getParentFile();</span>
+
+<span class="nc" id="L50">            return clsDirParent;</span>
+        } else {
+            // CoudeSourceが取得できなかった場合 - 主にセキュリティ的な理由による
+<span class="nc" id="L53">            return null;</span>
+        }
+    }
+
+    /**
+     * フィールド名を指定して、クラスで定義されているフィールドを取得します。
+     * &lt;p&gt;
+     * クラス定義されているフィールドの中で、指定された名前と一致するものを返します。フィールドの
+     * スコープはpublic以外のものでも名前が一致すればそのフィールドを返します。指定されたクラスに
+     * フィールドが見つからなかった場合は、以下の手順でインターフェース及びスーパー・クラスを
+     * 再帰的に取得して指定されたフィールド名に一致するフィールドを探索します。
+     * &lt;ol&gt;
+     * &lt;li&gt;
+     *   指定されたクラスを実装しているインターフェースを順番に取得して、そのインターフェースで
+     *   定義されているフィールドを検索する
+     * &lt;/li&gt;
+     * &lt;li&gt;
+     *   指定されたクラスのスーパー・クラスを取得して、そのクラスで定義されているフィールドを
+     *   検索する。
+     * &lt;/li&gt;
+     * &lt;/ol&gt;
+     *
+     * @param classz クラス
+     * @param name フィールド名
+     * @param modifiers フィールドの取得対象のアクセス修飾子を{@link java.lang.reflect.Modifier}クラスの定数の和で
+     *      指定する。取得対象のアクセス修飾子を指定しない場合は、-1を指定すること。
+     * @return 見つかったフィールドを返します。クラスまたはフィールド名にnullを指定した場合は
+     *      nullを返します。
+     * @throws NoSuchFieldException 指定された名前と一致するフィールドが見つからなかった場合
+     * @throws SecurityException セキュリティ・マネージャでエラーが発生した場合。エラーの
+     *      発生する条件は、{@link Class#getDeclaredField(String)}の仕様を参照のこと。
+     */
+    public static Field findField(Class&lt;?&gt; classz, String name, int modifiers)
+            throws NoSuchFieldException, SecurityException {
+<span class="nc bnc" id="L87" title="All 4 branches missed.">        if (classz == null || name == null) {</span>
+<span class="nc" id="L88">            return null;</span>
+        }
+
+<span class="nc" id="L91">        Field field = null;</span>
+        try {
+<span class="nc" id="L93">            field = classz.getDeclaredField(name);</span>
+<span class="nc" id="L94">        } catch (NoSuchFieldException e) {</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">            for (Class&lt;?&gt; iface : classz.getInterfaces()) {</span>
+                try {
+<span class="nc" id="L97">                    field = findField(iface, name, modifiers);</span>
+<span class="nc" id="L98">                    break;</span>
+<span class="nc" id="L99">                } catch (NoSuchFieldException ee) { }</span>
+            }
+
+<span class="nc bnc" id="L102" title="All 2 branches missed.">            if (field == null) {</span>
+<span class="nc" id="L103">                Class&lt;?&gt; superClass = classz.getSuperclass();</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                if (superClass != null) {</span>
+<span class="nc" id="L105">                    field = findField(superClass, name, modifiers);</span>
+                } else {
+<span class="nc" id="L107">                    throw e;</span>
+                }
+            }
+<span class="nc" id="L110">        }</span>
+
+<span class="nc bnc" id="L112" title="All 4 branches missed.">        if (modifiers &gt; 0 &amp;&amp; (field.getModifiers() &amp; modifiers) == 0) {</span>
+<span class="nc" id="L113">            throw new NoSuchFieldException(classz.getName() + &quot;.&quot; + name + &quot;does not match modifiers&quot;);</span>
+        }
+
+<span class="nc" id="L116">        return field;</span>
+    }
+
+    /**
+     * メソッド名とパラメータの型を指定して、クラスで定義されているフィールドを取得します。
+     * &lt;p&gt;
+     * クラス定義されているメソッドの中で、指定された名前及びパラメータの型一致するものを
+     * 返します。メソッドのスコープはpublic以外のものでも名前と型が一致すればそのメソッドを
+     * 返します。指定されたクラスにメソッドが見つからなかった場合は、以下の手順で
+     * インターフェース及びスーパー・クラスを再帰的に取得して指定されたメソッド名及び型に
+     * 一致するメソッドを探索します。
+     * &lt;ol&gt;
+     * &lt;li&gt;
+     *   指定されたクラスを実装しているインターフェースを順番に取得して、そのインターフェースで
+     *   定義されているメソッドを検索する
+     * &lt;/li&gt;
+     * &lt;li&gt;
+     *   指定されたクラスのスーパー・クラスを取得して、そのクラスで定義されているメソッドを
+     *   検索する。
+     * &lt;/li&gt;
+     * &lt;/ol&gt;
+     *
+     * @param classz クラス
+     * @param name メソッド名
+     * @param parameterTypes パラメータの型の配列。メソッドのパラメータの順番にパラメータの
+     *      クラスを配列に設定する。
+     * @param modifiers フィールドの取得対象のアクセス修飾子を{@link java.lang.reflect.Modifier}クラスの定数の和で
+     *      指定する。取得対象のアクセス修飾子を指定しない場合は、-1を指定すること。
+     * @return 見つかったメソッドを返します。クラス名またはメソッド名にnullを指定した場合はnullを
+     *      返します。
+     * @throws NoSuchMethodException 指定された名前及び方に一致するメソッドが見つからなかった場合
+     * @throws SecurityException セキュリティ・マネージャでエラーが発生した場合。エラーの
+     *      発生する条件は、{@link Class#getDeclaredMethod(String, Class...)}の仕様を参照のこと。
+     */
+    public static Method findMethod(Class&lt;?&gt; classz, String name, Class&lt;?&gt;[] parameterTypes, int modifiers)
+            throws NoSuchMethodException, SecurityException {
+<span class="nc bnc" id="L152" title="All 4 branches missed.">        if (classz == null || name == null) {</span>
+<span class="nc" id="L153">            return null;</span>
+        }
+
+<span class="nc" id="L156">        Method method = null;</span>
+        try {
+<span class="nc" id="L158">            method = classz.getDeclaredMethod(name, parameterTypes);</span>
+<span class="nc" id="L159">        } catch (NoSuchMethodException e) {</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">            for (Class&lt;?&gt; iface : classz.getInterfaces()) {</span>
+                try {
+<span class="nc" id="L162">                    method = findMethod(iface, name, parameterTypes, modifiers);</span>
+<span class="nc" id="L163">                    break;</span>
+<span class="nc" id="L164">                } catch (NoSuchMethodException ee) { }</span>
+            }
+
+<span class="nc bnc" id="L167" title="All 2 branches missed.">            if (method == null) {</span>
+<span class="nc" id="L168">                Class&lt;?&gt; superClass = classz.getSuperclass();</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">                if (superClass != null) {</span>
+<span class="nc" id="L170">                    method = findMethod(superClass, name, parameterTypes, modifiers);</span>
+                } else {
+<span class="nc" id="L172">                    throw e;</span>
+                }
+            }
+<span class="nc" id="L175">        }</span>
+
+<span class="nc bnc" id="L177" title="All 4 branches missed.">        if (modifiers &gt; 0 &amp;&amp; (method.getModifiers() &amp; modifiers) == 0) {</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            if (parameterTypes == null) {</span>
+<span class="nc" id="L179">                parameterTypes = new Class[] {};</span>
+            }
+<span class="nc" id="L181">            throw new NoSuchMethodException(classz.getName() + &quot;.&quot; + name + &quot;(&quot; + Arrays.asList(parameterTypes)</span>
+                    + &quot;) does not match modifiers&quot;);
+        }
+
+<span class="nc" id="L185">        return method;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
