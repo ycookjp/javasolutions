@@ -29,7 +29,7 @@
     <proxy.port></proxy.port>
     <slf4j.ver>1.7.25</slf4j.ver>
     <logback.ver>1.2.3</logback.ver>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <maven-compiler.ver>3.7.0</maven-compiler.ver>
     <maven-jar.ver>3.0.2</maven-jar.ver>
     <maven-source.ver>3.0.1</maven-source.ver>
