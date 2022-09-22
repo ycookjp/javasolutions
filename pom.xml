@@ -30,20 +30,20 @@
     <slf4j.ver>1.7.25</slf4j.ver>
     <logback.ver>1.2.3</logback.ver>
     <junit.version>4.13.1</junit.version>
-    <maven-compiler.ver>3.7.0</maven-compiler.ver>
-    <maven-jar.ver>3.0.2</maven-jar.ver>
-    <maven-source.ver>3.0.1</maven-source.ver>
-    <maven-surefire.ver>3.0.0-M2</maven-surefire.ver>
-    <jacoco-maven.ver>0.8.0</jacoco-maven.ver>
-    <maven-site.ver>3.7.1</maven-site.ver>
-    <maven-project-info-reports.ver>3.0.0</maven-project-info-reports.ver>
-    <maven-javadoc.ver>3.0.0</maven-javadoc.ver>
-    <maven-checkstyle.ver>3.0.0</maven-checkstyle.ver>
+    <maven-compiler.ver>3.10.1</maven-compiler.ver>
+    <maven-jar.ver>3.3.0</maven-jar.ver>
+    <maven-source.ver>3.2.1</maven-source.ver>
+    <maven-surefire.ver> 3.0.0-M7</maven-surefire.ver>
+    <jacoco-maven.ver>0.8.8</jacoco-maven.ver>
+    <maven-site.ver>3.12.1</maven-site.ver>
+    <maven-project-info-reports.ver>3.4.1</maven-project-info-reports.ver>
+    <maven-javadoc.ver>3.4.1</maven-javadoc.ver>
+    <maven-checkstyle.ver>3.2.0</maven-checkstyle.ver>
     <findbugs-maven.ver>3.0.5</findbugs-maven.ver>
-    <maven-surefire-report.ver>2.20.1</maven-surefire-report.ver>
-    <maven-jxr.ver>2.1</maven-jxr.ver>
-    <maven-assembly.var>3.1.1</maven-assembly.var>
-    <maven-antrun.ver>1.7</maven-antrun.ver>
+    <maven-surefire-report.ver>3.0.0-M7</maven-surefire-report.ver>
+    <maven-jxr.ver>3.3.0</maven-jxr.ver>
+    <maven-assembly.var>3.4.2</maven-assembly.var>
+    <maven-antrun.ver>3.1.0</maven-antrun.ver>
   </properties>
   <dependencies>
     <dependency>
