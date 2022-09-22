@@ -42,36 +42,36 @@ public class SwingUtils {
      *     指定された名前の{@link Container}が見つからなかった場合はnullを返します。
      */
     public static Component getComponentByName(Container container, String name) {
-<span class="nc" id="L45">        Component result = null;</span>
-<span class="nc bnc" id="L46" title="All 4 branches missed.">        if (container == null || name == null) {</span>
+<span class="fc" id="L45">        Component result = null;</span>
+<span class="pc bpc" id="L46" title="2 of 4 branches missed.">        if (container == null || name == null) {</span>
 <span class="nc" id="L47">            return null;</span>
         }
 
-<span class="nc" id="L50">        Component[] components = container.getComponents();</span>
-<span class="nc bnc" id="L51" title="All 2 branches missed.">        for (Component component : components) {</span>
-<span class="nc" id="L52">            String componentName = component.getName();</span>
-<span class="nc bnc" id="L53" title="All 2 branches missed.">            if (name.equals(componentName)) {</span>
+<span class="fc" id="L50">        Component[] components = container.getComponents();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        for (Component component : components) {</span>
+<span class="fc" id="L52">            String componentName = component.getName();</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if (name.equals(componentName)) {</span>
                 // 指定された名前のComponentが見つかったらそのコンポーネントを返す。
-<span class="nc" id="L55">                result = component;</span>
-<span class="nc" id="L56">                break;</span>
+<span class="fc" id="L55">                result = component;</span>
+<span class="fc" id="L56">                break;</span>
             }
         }
 
-<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (result == null) {</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (result == null) {</span>
             // Container直下のComponentから見つからなかった場合は、再帰的にComponentを取得する
-<span class="nc bnc" id="L62" title="All 2 branches missed.">            for (Component component  : components) {</span>
-<span class="nc bnc" id="L63" title="All 2 branches missed.">                if (component instanceof Container) {</span>
-<span class="nc" id="L64">                    Container childContainer = (Container) component;</span>
-<span class="nc" id="L65">                    Component child = getComponentByName(childContainer, name);</span>
-<span class="nc bnc" id="L66" title="All 4 branches missed.">                    if (child != null &amp;&amp; name.equals(child.getName())) {</span>
-<span class="nc" id="L67">                        result = child;</span>
-<span class="nc" id="L68">                        break;</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            for (Component component  : components) {</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">                if (component instanceof Container) {</span>
+<span class="fc" id="L64">                    Container childContainer = (Container) component;</span>
+<span class="fc" id="L65">                    Component child = getComponentByName(childContainer, name);</span>
+<span class="pc bpc" id="L66" title="1 of 4 branches missed.">                    if (child != null &amp;&amp; name.equals(child.getName())) {</span>
+<span class="fc" id="L67">                        result = child;</span>
+<span class="fc" id="L68">                        break;</span>
                     }
                 }
             }
         }
 
-<span class="nc" id="L74">        return result;</span>
+<span class="fc" id="L74">        return result;</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

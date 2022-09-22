@@ -19,21 +19,21 @@ public class ExceptionUtils {
      *      nullを返します。
      */
     public static String getStackTraceString(Exception e) {
-<span class="nc bnc" id="L22" title="All 2 branches missed.">        if (e == null) {</span>
-<span class="nc" id="L23">            return null;</span>
+<span class="fc bfc" id="L22" title="All 2 branches covered.">        if (e == null) {</span>
+<span class="fc" id="L23">            return null;</span>
         }
 
-<span class="nc" id="L26">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L26">        StringBuilder sb = new StringBuilder();</span>
 
-<span class="nc" id="L28">        sb.append(e.toString());</span>
-<span class="nc" id="L29">        sb.append(System.getProperty(&quot;line.separator&quot;));</span>
-<span class="nc" id="L30">        StackTraceElement[] elements = e.getStackTrace();</span>
-<span class="nc bnc" id="L31" title="All 2 branches missed.">        for (StackTraceElement element : elements) {</span>
-<span class="nc" id="L32">            sb.append(&quot;    at &quot; + element.toString());</span>
-<span class="nc" id="L33">            sb.append(System.getProperty(&quot;line.separator&quot;));</span>
+<span class="fc" id="L28">        sb.append(e.toString());</span>
+<span class="fc" id="L29">        sb.append(System.getProperty(&quot;line.separator&quot;));</span>
+<span class="fc" id="L30">        StackTraceElement[] elements = e.getStackTrace();</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        for (StackTraceElement element : elements) {</span>
+<span class="fc" id="L32">            sb.append(&quot;    at &quot; + element.toString());</span>
+<span class="fc" id="L33">            sb.append(System.getProperty(&quot;line.separator&quot;));</span>
         }
 
-<span class="nc" id="L36">        return sb.toString();</span>
+<span class="fc" id="L36">        return sb.toString();</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

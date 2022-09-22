@@ -30,27 +30,27 @@ public class ClassUtils {
      * @throws URISyntaxException URIの構文が間違っている場合
      */
     public static File getClassDirParent(Class&lt;? extends Object&gt; cls) throws URISyntaxException {
-<span class="nc bnc" id="L33" title="All 2 branches missed.">        if (cls == null) {</span>
-<span class="nc" id="L34">            return null;</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (cls == null) {</span>
+<span class="fc" id="L34">            return null;</span>
         }
 
         // 指定されたクラスが配置されたクラスパスのディレクトリまたはJarファイルのパスを取得
-<span class="nc" id="L38">        CodeSource cs = cls.getProtectionDomain().getCodeSource();</span>
+<span class="fc" id="L38">        CodeSource cs = cls.getProtectionDomain().getCodeSource();</span>
 
-<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (cs != null) {</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if (cs != null) {</span>
             // CodeSourceが取得できた場合
-<span class="nc" id="L42">            URL location = cs.getLocation();</span>
-<span class="nc" id="L43">            URI clsUri = location.toURI();</span>
+<span class="fc" id="L42">            URL location = cs.getLocation();</span>
+<span class="fc" id="L43">            URI clsUri = location.toURI();</span>
 
-<span class="nc" id="L45">            File clsDirPath = new File(clsUri.getPath());</span>
+<span class="fc" id="L45">            File clsDirPath = new File(clsUri.getPath());</span>
 
             // 取得したファイルの親ディレクトリを返す。
-<span class="nc" id="L48">            File clsDirParent = clsDirPath.getParentFile();</span>
+<span class="fc" id="L48">            File clsDirParent = clsDirPath.getParentFile();</span>
 
-<span class="nc" id="L50">            return clsDirParent;</span>
+<span class="fc" id="L50">            return clsDirParent;</span>
         } else {
             // CoudeSourceが取得できなかった場合 - 主にセキュリティ的な理由による
-<span class="nc" id="L53">            return null;</span>
+<span class="fc" id="L53">            return null;</span>
         }
     }
 
@@ -84,36 +84,36 @@ public class ClassUtils {
      */
     public static Field findField(Class&lt;?&gt; classz, String name, int modifiers)
             throws NoSuchFieldException, SecurityException {
-<span class="nc bnc" id="L87" title="All 4 branches missed.">        if (classz == null || name == null) {</span>
-<span class="nc" id="L88">            return null;</span>
+<span class="fc bfc" id="L87" title="All 4 branches covered.">        if (classz == null || name == null) {</span>
+<span class="fc" id="L88">            return null;</span>
         }
 
-<span class="nc" id="L91">        Field field = null;</span>
+<span class="fc" id="L91">        Field field = null;</span>
         try {
-<span class="nc" id="L93">            field = classz.getDeclaredField(name);</span>
-<span class="nc" id="L94">        } catch (NoSuchFieldException e) {</span>
-<span class="nc bnc" id="L95" title="All 2 branches missed.">            for (Class&lt;?&gt; iface : classz.getInterfaces()) {</span>
+<span class="fc" id="L93">            field = classz.getDeclaredField(name);</span>
+<span class="fc" id="L94">        } catch (NoSuchFieldException e) {</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">            for (Class&lt;?&gt; iface : classz.getInterfaces()) {</span>
                 try {
-<span class="nc" id="L97">                    field = findField(iface, name, modifiers);</span>
-<span class="nc" id="L98">                    break;</span>
-<span class="nc" id="L99">                } catch (NoSuchFieldException ee) { }</span>
+<span class="fc" id="L97">                    field = findField(iface, name, modifiers);</span>
+<span class="fc" id="L98">                    break;</span>
+<span class="fc" id="L99">                } catch (NoSuchFieldException ee) { }</span>
             }
 
-<span class="nc bnc" id="L102" title="All 2 branches missed.">            if (field == null) {</span>
-<span class="nc" id="L103">                Class&lt;?&gt; superClass = classz.getSuperclass();</span>
-<span class="nc bnc" id="L104" title="All 2 branches missed.">                if (superClass != null) {</span>
-<span class="nc" id="L105">                    field = findField(superClass, name, modifiers);</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">            if (field == null) {</span>
+<span class="fc" id="L103">                Class&lt;?&gt; superClass = classz.getSuperclass();</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">                if (superClass != null) {</span>
+<span class="fc" id="L105">                    field = findField(superClass, name, modifiers);</span>
                 } else {
-<span class="nc" id="L107">                    throw e;</span>
+<span class="fc" id="L107">                    throw e;</span>
                 }
             }
-<span class="nc" id="L110">        }</span>
+<span class="fc" id="L110">        }</span>
 
-<span class="nc bnc" id="L112" title="All 4 branches missed.">        if (modifiers &gt; 0 &amp;&amp; (field.getModifiers() &amp; modifiers) == 0) {</span>
-<span class="nc" id="L113">            throw new NoSuchFieldException(classz.getName() + &quot;.&quot; + name + &quot;does not match modifiers&quot;);</span>
+<span class="fc bfc" id="L112" title="All 4 branches covered.">        if (modifiers &gt; 0 &amp;&amp; (field.getModifiers() &amp; modifiers) == 0) {</span>
+<span class="fc" id="L113">            throw new NoSuchFieldException(classz.getName() + &quot;.&quot; + name + &quot;does not match modifiers&quot;);</span>
         }
 
-<span class="nc" id="L116">        return field;</span>
+<span class="fc" id="L116">        return field;</span>
     }
 
     /**
@@ -149,40 +149,40 @@ public class ClassUtils {
      */
     public static Method findMethod(Class&lt;?&gt; classz, String name, Class&lt;?&gt;[] parameterTypes, int modifiers)
             throws NoSuchMethodException, SecurityException {
-<span class="nc bnc" id="L152" title="All 4 branches missed.">        if (classz == null || name == null) {</span>
-<span class="nc" id="L153">            return null;</span>
+<span class="fc bfc" id="L152" title="All 4 branches covered.">        if (classz == null || name == null) {</span>
+<span class="fc" id="L153">            return null;</span>
         }
 
-<span class="nc" id="L156">        Method method = null;</span>
+<span class="fc" id="L156">        Method method = null;</span>
         try {
-<span class="nc" id="L158">            method = classz.getDeclaredMethod(name, parameterTypes);</span>
-<span class="nc" id="L159">        } catch (NoSuchMethodException e) {</span>
-<span class="nc bnc" id="L160" title="All 2 branches missed.">            for (Class&lt;?&gt; iface : classz.getInterfaces()) {</span>
+<span class="fc" id="L158">            method = classz.getDeclaredMethod(name, parameterTypes);</span>
+<span class="fc" id="L159">        } catch (NoSuchMethodException e) {</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">            for (Class&lt;?&gt; iface : classz.getInterfaces()) {</span>
                 try {
-<span class="nc" id="L162">                    method = findMethod(iface, name, parameterTypes, modifiers);</span>
-<span class="nc" id="L163">                    break;</span>
-<span class="nc" id="L164">                } catch (NoSuchMethodException ee) { }</span>
+<span class="fc" id="L162">                    method = findMethod(iface, name, parameterTypes, modifiers);</span>
+<span class="fc" id="L163">                    break;</span>
+<span class="fc" id="L164">                } catch (NoSuchMethodException ee) { }</span>
             }
 
-<span class="nc bnc" id="L167" title="All 2 branches missed.">            if (method == null) {</span>
-<span class="nc" id="L168">                Class&lt;?&gt; superClass = classz.getSuperclass();</span>
-<span class="nc bnc" id="L169" title="All 2 branches missed.">                if (superClass != null) {</span>
-<span class="nc" id="L170">                    method = findMethod(superClass, name, parameterTypes, modifiers);</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">            if (method == null) {</span>
+<span class="fc" id="L168">                Class&lt;?&gt; superClass = classz.getSuperclass();</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">                if (superClass != null) {</span>
+<span class="fc" id="L170">                    method = findMethod(superClass, name, parameterTypes, modifiers);</span>
                 } else {
-<span class="nc" id="L172">                    throw e;</span>
+<span class="fc" id="L172">                    throw e;</span>
                 }
             }
-<span class="nc" id="L175">        }</span>
+<span class="fc" id="L175">        }</span>
 
-<span class="nc bnc" id="L177" title="All 4 branches missed.">        if (modifiers &gt; 0 &amp;&amp; (method.getModifiers() &amp; modifiers) == 0) {</span>
-<span class="nc bnc" id="L178" title="All 2 branches missed.">            if (parameterTypes == null) {</span>
-<span class="nc" id="L179">                parameterTypes = new Class[] {};</span>
+<span class="fc bfc" id="L177" title="All 4 branches covered.">        if (modifiers &gt; 0 &amp;&amp; (method.getModifiers() &amp; modifiers) == 0) {</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">            if (parameterTypes == null) {</span>
+<span class="fc" id="L179">                parameterTypes = new Class[] {};</span>
             }
-<span class="nc" id="L181">            throw new NoSuchMethodException(classz.getName() + &quot;.&quot; + name + &quot;(&quot; + Arrays.asList(parameterTypes)</span>
+<span class="fc" id="L181">            throw new NoSuchMethodException(classz.getName() + &quot;.&quot; + name + &quot;(&quot; + Arrays.asList(parameterTypes)</span>
                     + &quot;) does not match modifiers&quot;);
         }
 
-<span class="nc" id="L185">        return method;</span>
+<span class="fc" id="L185">        return method;</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
