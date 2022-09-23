@@ -15,7 +15,6 @@ import java.util.SortedMap;
 import javax.swing.JComponent;
 import javax.swing.table.JTableHeader;
 
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +22,7 @@ import myproject.java.utils.ClassUtils;
 import myproject.java.utils.ExceptionUtils;
 
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * {@link ClassUtils}クラスのテストを実行します。
