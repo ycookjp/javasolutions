@@ -71,29 +71,54 @@
 <section>
 <h2><a name="Reactor_Dependency_Convergence"></a>Reactor Dependency Convergence</h2>
 <table border="0" class="bodyTable"><caption>
-  <b>Statistics:</b>
+  <b>Legend:</b>
 </caption>
 <tr class="a">
+<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
+<td>At least one dependency has a differing version of the dependency or has SNAPSHOT dependencies.</td></tr></table><br />
+<table border="0" class="bodyTable"><caption>
+  <b>Statistics:</b>
+</caption>
+<tr class="b">
 <th>Number of modules:</th>
 <td>2</td></tr>
-<tr class="b">
+<tr class="a">
 <th>Number of dependencies (NOD):</th>
 <td>5</td></tr>
-<tr class="a">
-<th>Number of unique artifacts (NOA):</th>
-<td>5</td></tr>
 <tr class="b">
-<th>Number of version-conflicting artifacts (NOC):</th>
-<td>0</td></tr>
+<th>Number of unique artifacts (NOA):</th>
+<td>6</td></tr>
 <tr class="a">
+<th>Number of version-conflicting artifacts (NOC):</th>
+<td>1</td></tr>
+<tr class="b">
 <th>Number of SNAPSHOT artifacts (NOS):</th>
 <td>0</td></tr>
-<tr class="b">
-<th>Convergence (NOD/NOA):</th>
-<td><img src="images/icon_success_sml.gif" alt="[Success]" />&#160;<b>100 %</b></td></tr>
 <tr class="a">
+<th>Convergence (NOD/NOA):</th>
+<td><img src="images/icon_error_sml.gif" alt="[Error]" />&#160;<b>83 %</b></td></tr>
+<tr class="b">
 <th>Ready for release (100% convergence and no SNAPSHOTS):</th>
-<td><img src="images/icon_success_sml.gif" alt="[Success]" />&#160;<b>Success</b></td></tr></table></section>
+<td><img src="images/icon_error_sml.gif" alt="[Error]" />&#160;<b>Error</b><br />You do not have 100% convergence.</td></tr></table></section><section>
+<h3><a name="Dependencies_used_in_modules"></a>Dependencies used in modules</h3><section>
+<h4><a name="org.slf4j:slf4j-api"></a>org.slf4j:slf4j-api</h4>
+<table border="0" class="bodyTable">
+<tr class="a">
+<td><img src="images/icon_error_sml.gif" alt="[Error]" /></td>
+<td>
+<table border="0" class="bodyTable">
+<tr class="b">
+<td width="25%">1.7.25</td>
+<td>
+<ol style="list-style-type: decimal">
+<li>ycookjp.myproject:javasolutions:pom:0.0.1-SNAPSHOT<br />\-&#160;ch.qos.logback:logback-classic:jar:1.2.3:test<br />&#160;&#160;&#160;\-&#160;org.slf4j:slf4j-api:jar:1.7.25:test<br /></li><br />
+<li>ycookjp.myproject:javautils:jar:0.0.1-SNAPSHOT<br />\-&#160;ch.qos.logback:logback-classic:jar:1.2.3:test<br />&#160;&#160;&#160;\-&#160;org.slf4j:slf4j-api:jar:1.7.25:test<br /></li><br /></ol></td></tr>
+<tr class="a">
+<td width="25%">1.7.36</td>
+<td>
+<ol style="list-style-type: decimal">
+<li>ycookjp.myproject:javasolutions:pom:0.0.1-SNAPSHOT<br />\-&#160;org.slf4j:slf4j-api:jar:1.7.36:compile<br /></li><br />
+<li>ycookjp.myproject:javautils:jar:0.0.1-SNAPSHOT<br />\-&#160;org.slf4j:slf4j-api:jar:1.7.36:compile<br /></li><br /></ol></td></tr></table></td></tr></table></section></section>
       </div>
     </div>
     <div class="clear">

@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"myproject.java.utils"},{"l":"すべてのパッケージ","u":"allpackages-index.html"}];updateSearchResults();
+packageSearchIndex = [{"l":"myproject.java.utils","h":"","u":""},{"l":"すべてのパッケージ","h":"","u":"allpackages-index.html"}]

@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"myproject.java.utils","l":"ClassUtils"},{"p":"myproject.java.utils","l":"ExceptionUtils"},{"p":"myproject.java.utils","l":"PropertiesUtils"},{"p":"myproject.java.utils","l":"SwingUtils"}];updateSearchResults();
+typeSearchIndex = [{"l":"ClassUtils","h":"","u":""},{"l":"ExceptionUtils","h":"","u":""},{"l":"PropertiesUtils","h":"","u":""},{"l":"SwingUtils","h":"","u":""},{"l":"すべてのクラス","h":"","u":"allclasses-index.html"}]
