@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CsvIterator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">javautils</a> &gt; <a href="index.source.html" class="el_package">myproject.java.utils</a> &gt; <span class="el_source">CsvIterator.java</span></div><h1>CsvIterator.java</h1><pre class="source lang-java linenums">package myproject.java.utils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * ストリームからCSV形式のデータを読み取り、CSV１行分のデータを返すイテレータを
+ * 実装します。
+ * &lt;p/&gt;
+ * Copyright ycookjp
+ * https://github.com/ycookjp/
+ */
+public class CsvIterator implements Iterable&lt;List&lt;String&gt;&gt;, Iterator&lt;List&lt;String&gt;&gt; {
+    /**
+     * CSVデータを読み込むために、コンストラクタから渡された{@link Reader}より
+     * 作成された{@link BufferedReader}のインスタンス。
+     */
+<span class="fc" id="L22">    private BufferedReader linein = null;</span>
+
+    /**
+     * {@link #hasNext()}でストリームの最後かどうかを確認するために１文字を
+     * 読み込んだ結果を保持します。読み込んだ結果を保持しない場合はnullが
+     * 設定されます。
+     */
+<span class="fc" id="L29">    private StringBuilder strbuf = new StringBuilder();</span>
+
+    /**
+     * CSV形式のデータを入力する{@link Reader}を指定して、CSV１行分のデータを
+     * 返すイテレータを構築します。
+     * @param in
+     */
+<span class="fc" id="L36">    public CsvIterator(Reader in) {</span>
+<span class="fc" id="L37">        this.linein = new BufferedReader(in);</span>
+<span class="fc" id="L38">    }</span>
+
+    /**
+     * CSV１行分のCSV項目を格納知った{@link List}のイテレータを返します。
+     */
+    @Override
+    public Iterator&lt;List&lt;String&gt;&gt; iterator() {
+<span class="fc" id="L45">        return this;</span>
+    }
+
+    /**
+     * 反復処理でさらに要素がある場合にtrueを返します。 
+     * つまり、next()が例外をスローするのではなく要素を返す場合は、trueを
+     * 返します。
+     * このメソッドを呼び出すと、コンストラクタから渡された{@link Reader}の
+     * {@link Reader#read()}メソッドを呼び出し、-1が返された場合はfalseを
+     * 返します。そうでない場合は、{@link #strbuf}に読み込んだ文字を追加して
+     * trueを返します。
+     * 
+     * @return 次の要素がある場合はtrue、そうでない場合はfalseを返します。
+     * @throws RuntimeException 内部で{@link IOException}が発生した場合。
+     */
+    @Override
+    public boolean hasNext() {
+        try {
+<span class="fc" id="L63">            int c = this.linein.read();</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            if (c &lt; 0) {</span>
+<span class="fc" id="L65">                return false;</span>
+            } else {
+<span class="fc" id="L67">                this.strbuf.append((char) c);</span>
+<span class="fc" id="L68">                return true;</span>
+            }
+<span class="nc" id="L70">        } catch(IOException ie) {</span>
+<span class="nc" id="L71">            throw new RuntimeException(ie);</span>
+        }
+    }
+
+    /**
+     * CSV１行分のデータを格納した{@link List}を返します。
+     * &lt;p/&gt;
+     * CSV形式の文字列からCSVの項目を要素とする{@link List}を生成して返却する
+     * 処理は以下のとおりである。
+     * 
+     * &lt;ol&gt;
+     * &lt;li&gt;
+     *   「&quot;」が見つかったら次の「&quot;」が見つかるまでコンマや改行を含めて
+     *   読み込んだ文字列を現在処理中の{@link List}項目の文字列に追加する。
+     * &lt;/li&gt;
+     * &lt;li&gt;
+     *   カンマが見つかったら、現在処理中の{@link List}項目の文字列をlistに
+     *   追加して、次の{@link List}項目の文字列追加処理を開始する。その際
+     *   追加された{@link List}項目の文字列の先頭と最後が「&quot;」である場合は、
+     *   最初と最後の「&quot;」を除去し、連続する２つの「&quot;」は１つの「&quot;」に変換する。
+     * &lt;/li&gt;
+     * &lt;li&gt;
+     *   改行またはストリームの終わりに達したら、現在処理中の{@link List}項目の
+     *   文字列から最後の改行コードを除いて{@link List}に追加してそのlistを
+     *   返す。なお、追加された{@link List}項目の文字列の先頭と最後が「&quot;」の
+     *   場合の扱いは、カンマが見つかった場合と同様である。
+     *   
+     * @return CSV１行分の各項目が格納された{@link List}を返します。
+     * @throws RuntimeException 内部で{@link IOException}が発生した場合。
+     */
+    @Override
+    public List&lt;String&gt; next() {
+        try {
+<span class="fc" id="L104">            List&lt;String&gt; line = readCsv(this.linein);</span>
+<span class="fc" id="L105">            return line;</span>
+<span class="nc" id="L106">        } catch (IOException ie) {</span>
+<span class="nc" id="L107">            throw new RuntimeException(ie);</span>
+        }
+    }
+
+    /**
+     * 文字列の両端がダブルクォートの場合、両端のダブルクォートを削除して
+     * 更に「&quot;&quot;」を「&quot;」に置換します。
+     * @param str 変換元の文字列
+     * @return 変換結果の文字列を返します。
+     */
+    private String trimDoubleQuote(String str) {
+<span class="fc" id="L118">        String replaced = str;</span>
+<span class="pc bpc" id="L119" title="1 of 6 branches missed.">        if (str != null &amp;&amp; str.length() &gt; 1 &amp;&amp; str.charAt(0) == '&quot;'</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">                &amp;&amp; str.charAt(str.length() - 1) == '&quot;') {</span>
+            // 文字列の開始、終了文字が共にダブルクォートの場合
+<span class="fc" id="L122">            replaced = str.substring(1, str.length() - 1);</span>
+<span class="fc" id="L123">            replaced = replaced.replace(&quot;\&quot;\&quot;&quot;, &quot;\&quot;&quot;);</span>
+        }
+<span class="fc" id="L125">        return replaced;</span>
+    }
+    
+    /**
+     * {@link BufferedReader}からCSV１行分のデータを読み込み、CSVの各項目を
+     * ｛@link List}に格納して返します。
+     * &lt;p/&gt;
+     * @param in CSV
+     * @return CSVの各項目を格納した{@link List}を返します。
+     * @throws IOException 入力データの読み込みに失敗した場合
+     */
+    private List&lt;String&gt; readCsv(BufferedReader in) throws IOException {
+<span class="fc" id="L137">        boolean continueReading = true;</span>
+<span class="fc" id="L138">        boolean inDquote = false;</span>
+<span class="fc" id="L139">        List&lt;String&gt; rowdata = new ArrayList&lt;String&gt;();</span>
+        // CSV項目の初期化する
+<span class="fc" id="L141">        StringBuilder csvcol = new StringBuilder(this.strbuf);</span>
+        // 文字読み込みバッファをクリアする
+<span class="fc" id="L143">        this.strbuf.delete(0, strbuf.length());</span>
+        
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        while (continueReading) {</span>
+<span class="fc" id="L146">            String line = this.linein.readLine();</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">            if (line == null) {</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">                if (csvcol.length() &gt; 0) {</span>
+<span class="nc" id="L149">                    rowdata.add(trimDoubleQuote(csvcol.toString()));</span>
+                }
+<span class="nc" id="L151">                continueReading = false;</span>
+            }
+<span class="fc" id="L153">            int index = 0;</span>
+            // １行の文字列を順に調べる
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            while (index &lt; line.length()) {</span>
+                // ダブルクォートの中である場合
+<span class="fc bfc" id="L157" title="All 2 branches covered.">                if (inDquote) {</span>
+                    // 次のダブルクォートの出現位置を取得
+<span class="fc" id="L159">                    int dqidx = line.indexOf('&quot;', index);</span>
+                    // 次のダブルクォートが見つからない場合は改行を含む行末までの
+                    // 文字列をセルの文字に追加して、次の行を読み込む
+<span class="fc bfc" id="L162" title="All 2 branches covered.">                    if (dqidx &lt; 0) {</span>
+<span class="fc" id="L163">                        csvcol.append(line.substring(index));</span>
+<span class="fc" id="L164">                        index = line.length();</span>
+                    } else {
+                        // 次のダブルクォートの文字が見つかったらそこまでの文字列をセルの
+                        // 文字に追加して、それ以降の文字を処理する
+<span class="fc" id="L168">                        csvcol.append(line.substring(index, dqidx + 1));</span>
+<span class="fc" id="L169">                        index = dqidx + 1;</span>
+<span class="fc" id="L170">                        inDquote = false;</span>
+                    }
+<span class="fc" id="L172">                } else {</span>
+                    // 次のダブルクォート、カンマの出現位置を取得
+<span class="fc" id="L174">                    int dqidx = line.indexOf('&quot;', index);</span>
+<span class="fc" id="L175">                    int cmidx = line.indexOf(',', index);</span>
+<span class="fc bfc" id="L176" title="All 6 branches covered.">                    if (dqidx &gt;= 0 &amp;&amp; (cmidx &lt; 0 || dqidx &lt; cmidx)) {</span>
+                        // ダブルクォートの前にコンマが存在しない場合
+                        // ダブルクォートまでをセルの文字列に追加する
+<span class="fc" id="L179">                        csvcol.append(line.substring(index, dqidx + 1));</span>
+<span class="fc" id="L180">                        inDquote = true;</span>
+<span class="fc" id="L181">                        index = dqidx + 1;</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">                    } else if (cmidx &gt;= 0) {</span>
+                        // コンマの前にダブルクォートが存在しない場合
+                        // コンマの前までの文字列をセルの文字列に追加し、次のセルの処理を開始
+<span class="fc" id="L185">                        csvcol.append(line.substring(index, cmidx));</span>
+<span class="fc" id="L186">                        rowdata.add(trimDoubleQuote(csvcol.toString()));</span>
+<span class="fc" id="L187">                        csvcol.delete(0, csvcol.length());</span>
+<span class="fc" id="L188">                        index = cmidx + 1;</span>
+                    } else {
+                        // コンマもダブルクォートも存在しない場合
+                        // 行末までの文字をセルの文字列に追加し、１行分のCSVデータを返す
+<span class="fc" id="L192">                        csvcol.append(line.substring(index));</span>
+<span class="fc" id="L193">                        index = line.length();</span>
+                    }
+                }
+<span class="fc bfc" id="L196" title="All 4 branches covered.">                if (index &gt;= line.length() &amp;&amp; inDquote) {</span>
+<span class="fc" id="L197">                    csvcol.append(System.lineSeparator());</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">                } else if (index &gt;= line.length()) {</span>
+<span class="fc" id="L199">                    rowdata.add(trimDoubleQuote(csvcol.toString()));</span>
+<span class="fc" id="L200">                    continueReading = false;</span>
+                }
+            }
+<span class="fc" id="L203">        }</span>
+<span class="fc" id="L204">        return rowdata;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

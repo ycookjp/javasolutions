@@ -1,0 +1,1 @@
+/usr/lib/jvm/java-17-openjdk-17.0.8.0.7-1.fc38.x86_64/bin/javadoc -J-Dhttps.proxyHost= -J-Dhttps.proxyPort= @options @packages

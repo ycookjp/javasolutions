@@ -2,4 +2,5 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 javautils,myproject.java.utils,ClassUtils,0,179,1,33,0,48,1,19,0,3
 javautils,myproject.java.utils,SwingUtils,2,75,4,14,1,17,4,6,0,1
 javautils,myproject.java.utils,PropertiesUtils,6,105,2,14,2,32,2,8,0,2
+javautils,myproject.java.utils,CsvIterator,24,246,4,32,7,58,3,21,0,6
 javautils,myproject.java.utils,ExceptionUtils,0,51,0,4,0,10,0,3,0,1
