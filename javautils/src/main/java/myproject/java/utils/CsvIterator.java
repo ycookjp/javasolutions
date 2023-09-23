@@ -10,11 +10,37 @@ import java.util.List;
 /**
  * ストリームからCSV形式のデータを読み取り、CSV１行分のデータを返すイテレータを
  * 実装します。
- * <p/>
+ * <p>
  * Copyright ycookjp
  * https://github.com/ycookjp/
+ * </p>
+ * <table border='1'><caption>【使用例】</caption><tr><td><pre>
+ * import myproject.java.utils.CsvIterator;
+ * import java.io.FileInputStream;
+ * import java.io.InputStreamReader;
+ * import java.io.Reader;
+ * import java.io.IOException;
+ * ...
+ * Reader in = null;
+ * try {
+ *     in = new InputStreamReader(
+ *             new FileInputStream("/path/to/csv"), "UTF-8");
+ *     for (List&gt;String&lt; rowdata: new CsvIterator(in)) {
+ *         ...
+ *     }
+ * } catch (IOException ie) {
+ *     ...
+ * } finally {
+ *     if (in != null) {
+ *         try {
+ *             in.close();
+ *         } catch (IOException ie) { }
+ *     }
+ * }
+ * </pre></td></tr></table>
  */
 public class CsvIterator implements Iterable<List<String>>, Iterator<List<String>> {
+
     /**
      * CSVデータを読み込むために、コンストラクタから渡された{@link Reader}より
      * 作成された{@link BufferedReader}のインスタンス。
@@ -22,20 +48,26 @@ public class CsvIterator implements Iterable<List<String>>, Iterator<List<String
     private BufferedReader linein = null;
 
     /**
-     * {@link #hasNext()}でストリームの最後かどうかを確認するために１文字を
-     * 読み込んだ結果を保持します。読み込んだ結果を保持しない場合はnullが
-     * 設定されます。
+     * {@link #hasNext()}でストリームの最後かどうかを確認するために先読みした
+     * １行の文字列を保持します。読み込んだ結果を保持しない場合はnullが 設定
+     * されます。
      */
-    private StringBuilder strbuf = new StringBuilder();
+    private String strbuf = null;
 
     /**
      * CSV形式のデータを入力する{@link Reader}を指定して、CSV１行分のデータを
      * 返すイテレータを構築します。
-     * @param in
+     * @param in CSV形式のデータを入力する{@link Reader}
      */
     public CsvIterator(Reader in) {
         this.linein = new BufferedReader(in);
     }
+
+    /**
+     *  外部からのデフォルトコンストラクタ呼び出しを抑止するための
+     *  コンストラクタ。
+     */
+    protected CsvIterator() { }
 
     /**
      * CSV１行分のCSV項目を格納知った{@link List}のイテレータを返します。
@@ -46,38 +78,38 @@ public class CsvIterator implements Iterable<List<String>>, Iterator<List<String
     }
 
     /**
-     * 反復処理でさらに要素がある場合にtrueを返します。 
+     * 反復処理で更にに要素がある場合にtrueを返します。
      * つまり、next()が例外をスローするのではなく要素を返す場合は、trueを
      * 返します。
      * このメソッドを呼び出すと、コンストラクタから渡された{@link Reader}の
      * {@link Reader#read()}メソッドを呼び出し、-1が返された場合はfalseを
      * 返します。そうでない場合は、{@link #strbuf}に読み込んだ文字を追加して
      * trueを返します。
-     * 
+     *
      * @return 次の要素がある場合はtrue、そうでない場合はfalseを返します。
      * @throws RuntimeException 内部で{@link IOException}が発生した場合。
      */
     @Override
     public boolean hasNext() {
         try {
-            int c = this.linein.read();
-            if (c < 0) {
-                return false;
-            } else {
-                this.strbuf.append((char) c);
-                return true;
+            if (this.strbuf == null) {
+                this.strbuf = this.linein.readLine();
             }
-        } catch(IOException ie) {
+            if (this.strbuf == null) {
+                return false;
+            }
+            return true;
+        } catch (IOException ie) {
             throw new RuntimeException(ie);
         }
     }
 
     /**
      * CSV１行分のデータを格納した{@link List}を返します。
-     * <p/>
+     * <p>
      * CSV形式の文字列からCSVの項目を要素とする{@link List}を生成して返却する
      * 処理は以下のとおりである。
-     * 
+     *
      * <ol>
      * <li>
      *   「"」が見つかったら次の「"」が見つかるまでコンマや改行を含めて
@@ -94,7 +126,9 @@ public class CsvIterator implements Iterable<List<String>>, Iterator<List<String
      *   文字列から最後の改行コードを除いて{@link List}に追加してそのlistを
      *   返す。なお、追加された{@link List}項目の文字列の先頭と最後が「"」の
      *   場合の扱いは、カンマが見つかった場合と同様である。
-     *   
+     * </li>
+     * </ol>
+     *
      * @return CSV１行分の各項目が格納された{@link List}を返します。
      * @throws RuntimeException 内部で{@link IOException}が発生した場合。
      */
@@ -109,26 +143,9 @@ public class CsvIterator implements Iterable<List<String>>, Iterator<List<String
     }
 
     /**
-     * 文字列の両端がダブルクォートの場合、両端のダブルクォートを削除して
-     * 更に「""」を「"」に置換します。
-     * @param str 変換元の文字列
-     * @return 変換結果の文字列を返します。
-     */
-    private String trimDoubleQuote(String str) {
-        String replaced = str;
-        if (str != null && str.length() > 1 && str.charAt(0) == '"'
-                && str.charAt(str.length() - 1) == '"') {
-            // 文字列の開始、終了文字が共にダブルクォートの場合
-            replaced = str.substring(1, str.length() - 1);
-            replaced = replaced.replace("\"\"", "\"");
-        }
-        return replaced;
-    }
-    
-    /**
      * {@link BufferedReader}からCSV１行分のデータを読み込み、CSVの各項目を
      * ｛@link List}に格納して返します。
-     * <p/>
+     * <p></p>
      * @param in CSV
      * @return CSVの各項目を格納した{@link List}を返します。
      * @throws IOException 入力データの読み込みに失敗した場合
@@ -138,17 +155,17 @@ public class CsvIterator implements Iterable<List<String>>, Iterator<List<String
         boolean inDquote = false;
         List<String> rowdata = new ArrayList<String>();
         // CSV項目の初期化する
-        StringBuilder csvcol = new StringBuilder(this.strbuf);
-        // 文字読み込みバッファをクリアする
-        this.strbuf.delete(0, strbuf.length());
-        
+        StringBuilder csvcol = new StringBuilder();
+
         while (continueReading) {
-            String line = this.linein.readLine();
+            String line = readLine();
             if (line == null) {
                 if (csvcol.length() > 0) {
                     rowdata.add(trimDoubleQuote(csvcol.toString()));
                 }
-                continueReading = false;
+                break;
+            } else if (!inDquote && line.length() == 0) {
+                break;
             }
             int index = 0;
             // １行の文字列を順に調べる
@@ -202,5 +219,41 @@ public class CsvIterator implements Iterable<List<String>>, Iterator<List<String
             }
         }
         return rowdata;
+    }
+
+    /**
+     * 文字列の両端がダブルクォートの場合、両端のダブルクォートを削除して
+     * 更に「""」を「"」に置換します。
+     * @param str 変換元の文字列
+     * @return 変換結果の文字列を返します。
+     */
+    private String trimDoubleQuote(String str) {
+        String replaced = str;
+        if (str != null && str.length() > 1 && str.charAt(0) == '"'
+                && str.charAt(str.length() - 1) == '"') {
+            // 文字列の開始、終了文字が共にダブルクォートの場合
+            replaced = str.substring(1, str.length() - 1);
+            replaced = replaced.replace("\"\"", "\"");
+        }
+        return replaced;
+    }
+
+    /**
+     * CSVを入力する{@link Reader}から１行を読み込みます。
+     *
+     * {@link #hasNext()}で先読みした１行の文字列があればそれを帰します。
+     * 先読みしたデータがなければCSVを入力する{@link Reader}から１行を読み込み
+     * その文字列を帰します。
+     * @return CSVを入力する[@link Reader}から読み込んだ１行の文字列を帰します。
+     *      返却される文字列に改行は含みません。
+     * @throws IOException
+     */
+    private String readLine() throws IOException {
+        String line = this.strbuf;
+        if (line == null) {
+            line = this.linein.readLine();
+        }
+        this.strbuf = null;
+        return line;
     }
 }

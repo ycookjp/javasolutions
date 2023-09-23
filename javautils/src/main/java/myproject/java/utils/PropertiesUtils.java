@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * {@link java.util.Properties}の操作を提供します。
- * 
+ *
  * Copyright ycookjp
  * https://github.com/ycookjp/
  */

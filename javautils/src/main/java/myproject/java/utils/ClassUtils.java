@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 /**
  * {@link java.lang.Class}の操作を提供します。
- * 
+ *
  * Copyright ycookjp
  * https://github.com/ycookjp/
  */

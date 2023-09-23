@@ -8,7 +8,7 @@ import java.awt.Container;
  * <p>
  * この実装は、性能について考慮されていないため実際に適用する場合は適宜ソースコードの
  * 改変を検討してください。
- * 
+ *
  * Copyright ycookjp
  * https://github.com/ycookjp/
  */
